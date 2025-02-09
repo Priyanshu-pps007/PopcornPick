@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PopcornPick",
+  title: "PopkornPick",
   description: "Pick your fav movies to watch",
 };
 

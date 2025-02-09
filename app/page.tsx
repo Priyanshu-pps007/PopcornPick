@@ -158,7 +158,7 @@ const HomePage = () => {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold" style={{
           color:"red"
-        }}>PopcornPick</h1>
+        }}>PopkornPick</h1>
         <button
           onClick={() => router.push('/favourite')}
           className="flex items-center text-white hover:text-blue-500"

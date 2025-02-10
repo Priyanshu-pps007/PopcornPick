@@ -165,7 +165,8 @@ const HomePage = () => {
         >
           
           <span className="font-medium" style={{
-            color:"red"
+            color:"red",
+            fontWeight:"bold"
           }}>Favorites</span>
         </button>
       </header>

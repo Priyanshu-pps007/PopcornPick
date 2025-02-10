@@ -9,7 +9,7 @@ interface Movie {
   title: string
   poster_path?: string
   genre_ids: number[]
-  vote_average: number
+  vote_average?: number // Make vote_average optional
 }
 
 interface Genre {
@@ -133,7 +133,7 @@ const HomePage = () => {
       debounce((searchText: string) => {
         setSearchTerm(searchText)
         setPage(1)
-      }, 100),
+      }, 100), // Debounce delay set to 100ms
     []
   )
 
@@ -243,38 +243,27 @@ const HomePage = () => {
             key={movie.id}
             className="relative rounded-lg overflow-hidden shadow-md cursor-pointer"
           >
-             {movie.poster_path ? (
-        <div className="relative">
-          {loading && (
-            <p className="absolute top-0 left-0 right-0 text-center text-white bg-gray-800 bg-opacity-75 py-1 rounded-t-lg" style={{
-              marginTop:"20vh"
-            }}>
-              Loading image...
-            </p>
-          )}
-          <img
-            src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-            className={`w-full h-auto object-cover rounded-lg transition-transform transform hover:scale-105 ${
-              loading ? "opacity-0" : "opacity-100"
-            }`}
-            alt={movie.title}
-            onLoad={() => setLoading(false)}
-            onClick={() => router.push(`/${movie.id}`)}
-          />
-        </div>
-      ) : (
-        <div
-          className="w-full h-auto object-cover rounded-lg bg-gray-700 flex items-center justify-center text-center p-4"
-          onClick={() => router.push(`/${movie.id}`) } style={{
-            marginTop:"20vh"
-          }}
-        >
-          No Image Available
-        </div>
-      )}
+            {movie.poster_path ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                className="w-full h-auto object-cover rounded-lg transition-transform transform hover:scale-105"
+                alt={movie.title}
+                onClick={() => router.push(`/${movie.id}`)}
+              />
+            ) : (
+              <div
+                className="w-full h-auto object-cover rounded-lg bg-gray-700 flex items-center justify-center text-center p-4"
+                onClick={() => router.push(`/${movie.id}`)}
+                style={{
+                  marginTop: '20vh',
+                }}
+              >
+                No Image Available
+              </div>
+            )}
             {/* Rating */}
             <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded">
-              {movie.vote_average.toFixed(1)} ⭐
+              {movie.vote_average !== undefined ? movie.vote_average.toFixed(1) : 'N/A'} ⭐
             </div>
             {/* Heart Icon */}
             <button

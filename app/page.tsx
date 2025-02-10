@@ -9,7 +9,7 @@ interface Movie {
   title: string
   poster_path?: string
   genre_ids: number[]
-  vote_average?: number // Make vote_average optional
+  vote_average?: number
 }
 
 interface Genre {
@@ -28,6 +28,7 @@ const HomePage = () => {
   const [hasMore, setHasMore] = useState(true)
   const [favorites, setFavorites] = useState<number[]>([])
   const [inputValue, setInputValue] = useState('')
+  const [moviefound, setMovieFound] = useState<boolean>(true)
 
   const fetchGenres = async () => {
     try {
@@ -68,17 +69,23 @@ const HomePage = () => {
         }
       )
 
-      if (pageNum === 1) {
-        setMovies(response.data.results)
+      if (response.data?.total_results === 0 && pageNum === 1) {
+        setMovieFound(false)
+        setMovies([]) // Clear previous movies
       } else {
-        setMovies((prevMovies) => {
-          // Filter out duplicates
-          const newMovies = response.data.results.filter(
-            (newMovie: Movie) =>
-              !prevMovies.some((movie) => movie.id === newMovie.id)
-          )
-          return [...prevMovies, ...newMovies]
-        })
+        setMovieFound(true) // Set to true when movies are found
+        if (pageNum === 1) {
+          setMovies(response.data.results)
+        } else {
+          setMovies((prevMovies) => {
+            // Filter out duplicates
+            const newMovies = response.data.results.filter(
+              (newMovie: Movie) =>
+                !prevMovies.some((movie) => movie.id === newMovie.id)
+            )
+            return [...prevMovies, ...newMovies]
+          })
+        }
       }
 
       setHasMore(response.data.page < response.data.total_pages)
@@ -237,80 +244,86 @@ const HomePage = () => {
       </div>
 
       {/* Movie Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {movies.map((movie) => (
-          <div
-            key={movie.id}
-            className="relative rounded-lg overflow-hidden shadow-md cursor-pointer"
-          >
-            {movie.poster_path ? (
-              <img
-                src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
-                className="w-full h-auto object-cover rounded-lg transition-transform transform hover:scale-105"
-                alt={movie.title}
-                onClick={() => router.push(`/${movie.id}`)}
-              />
-            ) : (
-              <div
-                className="w-full h-auto object-cover rounded-lg bg-gray-700 flex items-center justify-center text-center p-4"
-                onClick={() => router.push(`/${movie.id}`)}
-                style={{
-                  marginTop: '20vh',
-                }}
-              >
-                No Image Available
-              </div>
-            )}
-            {/* Rating */}
-            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded">
-              {movie.vote_average !== undefined ? movie.vote_average.toFixed(1) : 'N/A'} ⭐
-            </div>
-            {/* Heart Icon */}
-            <button
-              className="absolute top-2 right-2 text-white"
-              onClick={() => handleFavoriteClick(movie.id)}
+      {moviefound ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          {movies.map((movie) => (
+            <div
+              key={movie.id}
+              className="relative rounded-lg overflow-hidden shadow-md cursor-pointer"
             >
-              {favorites.includes(movie.id) ? (
-                <svg
-                  className="w-6 h-6 text-red-500"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12 21.35l-1.45-1.32C5.4  
-                          15.36 2 12.28 2 8.5 2  
-                          5.42 4.42 3 7.5 3c1.74 0  
-                          3.41 0.81 4.5 2.09C13.09  
-                          3.81 14.76 3 16.5 3c3.08  
-                          0 5.5 2.42 5.5 5.5 0 3.78-3.4  
-                          6.86-8.55 11.54L12 21.35z"
-                  />
-                </svg>
+              {movie.poster_path ? (
+                <img
+                  src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`}
+                  className="w-full h-auto object-cover rounded-lg transition-transform transform hover:scale-105"
+                  alt={movie.title}
+                  onClick={() => router.push(`/${movie.id}`)}
+                />
               ) : (
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                <div
+                  className="w-full h-auto object-cover rounded-lg bg-gray-700 flex items-center justify-center text-center p-4"
+                  onClick={() => router.push(`/${movie.id}`)}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 21.35l-1.45-1.32C5.4  
-                          15.36 2 12.28 2 8.5 2  
-                          5.42 4.42 3 7.5 3c1.74 0  
-                          3.41 0.81 4.5 2.09C13.09  
-                          3.81 14.76 3 16.5 3c3.08  
-                          0 5.5 2.42 5.5 5.5 0 3.78-3.4  
-                          6.86-8.55 11.54L12 21.35z"
-                  />
-                </svg>
+                  No Image Available
+                </div>
               )}
-            </button>
-          </div>
-        ))}
-      </div>
+              {/* Rating */}
+              <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded">
+                {movie.vote_average !== undefined
+                  ? movie.vote_average.toFixed(1)
+                  : 'N/A'}{' '}
+                ⭐
+              </div>
+              {/* Heart Icon */}
+              <button
+                className="absolute top-2 right-2 text-white"
+                onClick={() => handleFavoriteClick(movie.id)}
+              >
+                {favorites.includes(movie.id) ? (
+                  <svg
+                    className="w-6 h-6 text-red-500"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 21.35l-1.45-1.32C5.4  
+                            15.36 2 12.28 2 8.5 2  
+                            5.42 4.42 3 7.5 3c1.74 0  
+                            3.41 0.81 4.5 2.09C13.09  
+                            3.81 14.76 3 16.5 3c3.08  
+                            0 5.5 2.42 5.5 5.5 0 3.78-3.4  
+                            6.86-8.55 11.54L12 21.35z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 21.35l-1.45-1.32C5.4  
+                            15.36 2 12.28 2 8.5 2  
+                            5.42 4.42 3 7.5 3c1.74 0  
+                            3.41 0.81 4.5 2.09C13.09  
+                            3.81 14.76 3 16.5 3c3.08  
+                            0 5.5 2.42 5.5 5.5 0 3.78-3.4  
+                            6.86-8.55 11.54L12 21.35z"
+                    />
+                  </svg>
+                )}
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center text-gray-500 mt-6 text-lg">
+          No Movies Found
+        </div>
+      )}
 
       {/* Loading Indicator */}
       {loading && (

@@ -91,7 +91,9 @@ const MovieDetailPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-gray-900 text-white">
       {/* Movie Title */}
-      <h1 className="text-4xl font-bold mb-2">{movie.title}</h1>
+      <h1 className="text-4xl font-bold mb-2" style={{
+        color:"red"
+      }}>{movie.title}</h1>
       <h2 className="text-xl text-gray-400 italic mb-4">
         ({movie.original_title})
       </h2>

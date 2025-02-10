@@ -9,6 +9,7 @@ interface Movie {
   title: string
   poster_path?: string
   genre_ids: number[]
+  vote_average: number
 }
 
 interface Genre {
@@ -72,7 +73,8 @@ const HomePage = () => {
         setMovies((prevMovies) => {
           // Filter out duplicates
           const newMovies = response.data.results.filter(
-            (newMovie: Movie) => !prevMovies.some((movie) => movie.id === newMovie.id)
+            (newMovie: Movie) =>
+              !prevMovies.some((movie) => movie.id === newMovie.id)
           )
           return [...prevMovies, ...newMovies]
         })
@@ -156,18 +158,27 @@ const HomePage = () => {
     <div className="min-h-screen bg-gray-900 text-white p-6">
       {/* Header */}
       <header className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold" style={{
-          color:"red"
-        }}>PopkornPick</h1>
+        <h1
+          className="text-3xl font-bold"
+          style={{
+            color: 'red',
+          }}
+        >
+          PopkornPick
+        </h1>
         <button
           onClick={() => router.push('/favourite')}
           className="flex items-center text-white hover:text-blue-500"
         >
-          
-          <span className="font-medium" style={{
-            color:"red",
-            fontWeight:"bold"
-          }}>Favorites</span>
+          <span
+            className="font-medium"
+            style={{
+              color: 'red',
+              fontWeight:"bolder"
+            }}
+          >
+            Favourite
+          </span>
         </button>
       </header>
 
@@ -177,6 +188,7 @@ const HomePage = () => {
           type="text"
           placeholder="Search movies..."
           onChange={handleSearchChange}
+          value={searchTerm}
           className="w-full p-3 text-lg bg-gray-800 rounded-lg text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
         />
 
@@ -233,6 +245,10 @@ const HomePage = () => {
                 No Image Available
               </div>
             )}
+            {/* Rating */}
+            <div className="absolute top-2 left-2 bg-black bg-opacity-50 text-white text-sm px-2 py-1 rounded">
+              {movie.vote_average.toFixed(1)} ⭐
+            </div>
             {/* Heart Icon */}
             <button
               className="absolute top-2 right-2 text-white"

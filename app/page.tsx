@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { debounce } from 'lodash'
@@ -27,6 +27,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
   const [favorites, setFavorites] = useState<number[]>([])
+  const [inputValue, setInputValue] = useState('')
 
   const fetchGenres = async () => {
     try {
@@ -127,13 +128,25 @@ const HomePage = () => {
     setFavorites(savedFavorites)
   }, [])
 
-  const handleSearchChange = debounce(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchTerm(e.target.value)
-      setPage(1)
-    },
-    100
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((searchText: string) => {
+        setSearchTerm(searchText)
+        setPage(1)
+      }, 100),
+    []
   )
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel()
+    }
+  }, [debouncedSearch])
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value)
+    debouncedSearch(e.target.value)
+  }
 
   const handleGenreChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedGenre(e.target.value ? Number(e.target.value) : null)
@@ -174,7 +187,7 @@ const HomePage = () => {
             className="font-medium"
             style={{
               color: 'red',
-              fontWeight:"bolder"
+              fontWeight: 'bolder',
             }}
           >
             Favourite
@@ -187,8 +200,8 @@ const HomePage = () => {
         <input
           type="text"
           placeholder="Search movies..."
-          onChange={handleSearchChange}
-          value={searchTerm}
+          onChange={handleInputChange}
+          value={inputValue}
           className="w-full p-3 text-lg bg-gray-800 rounded-lg text-white placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-500"
         />
 
@@ -262,12 +275,12 @@ const HomePage = () => {
                 >
                   <path
                     d="M12 21.35l-1.45-1.32C5.4  
-                      15.36 2 12.28 2 8.5 2  
-                      5.42 4.42 3 7.5 3c1.74 0  
-                      3.41 0.81 4.5 2.09C13.09  
-                      3.81 14.76 3 16.5 3c3.08  
-                      0 5.5 2.42 5.5 5.5 0 3.78-3.4  
-                      6.86-8.55 11.54L12 21.35z"
+                          15.36 2 12.28 2 8.5 2  
+                          5.42 4.42 3 7.5 3c1.74 0  
+                          3.41 0.81 4.5 2.09C13.09  
+                          3.81 14.76 3 16.5 3c3.08  
+                          0 5.5 2.42 5.5 5.5 0 3.78-3.4  
+                          6.86-8.55 11.54L12 21.35z"
                   />
                 </svg>
               ) : (
@@ -282,12 +295,12 @@ const HomePage = () => {
                     strokeLinejoin="round"
                     strokeWidth={2}
                     d="M12 21.35l-1.45-1.32C5.4  
-                      15.36 2 12.28 2 8.5 2  
-                      5.42 4.42 3 7.5 3c1.74 0  
-                      3.41 0.81 4.5 2.09C13.09  
-                      3.81 14.76 3 16.5 3c3.08  
-                      0 5.5 2.42 5.5 5.5 0 3.78-3.4  
-                      6.86-8.55 11.54L12 21.35z"
+                          15.36 2 12.28 2 8.5 2  
+                          5.42 4.42 3 7.5 3c1.74 0  
+                          3.41 0.81 4.5 2.09C13.09  
+                          3.81 14.76 3 16.5 3c3.08  
+                          0 5.5 2.42 5.5 5.5 0 3.78-3.4  
+                          6.86-8.55 11.54L12 21.35z"
                   />
                 </svg>
               )}

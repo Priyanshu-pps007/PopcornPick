@@ -3,6 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { debounce } from 'lodash'
+import Image from 'next/image'
 
 interface Movie {
   id: number
@@ -182,10 +183,14 @@ const HomePage = () => {
           className="text-3xl font-bold"
           style={{
             color: 'red',
+            display:"flex",
+            flexDirection:"row"
           }}
         >
           PopkornPick
+        <Image src="/popkorn.png" alt="Popcorn Image" width={40} height={40} />
         </h1>
+
         <button
           onClick={() => router.push('/favourite')}
           className="flex items-center text-white hover:text-blue-500"
